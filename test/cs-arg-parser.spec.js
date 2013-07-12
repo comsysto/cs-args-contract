@@ -68,6 +68,15 @@ describe('cs-args-contract', function() {
         contractViolation([1, {}], 'num,num', "2");
     });
 
+    it('can check functions', function() {
+        function f(){
+        };
+        valid([1, f], 'num,func');
+        valid([1, f], 'num,function');
+        contractViolation([1, true], 'num,func', "2");
+        contractViolation([1, {}], 'num,func', "2");
+    });
+
     it('can complicated stuff', function() {
         var contract = 'num, str | [ {name: str, age:number} | {alias: string | {name: string}} ], bool?, number?';
         valid([1, "blub"], contract);

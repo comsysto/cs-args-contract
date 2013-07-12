@@ -10,7 +10,7 @@ type
   = or / simpleType
 
 simpleType
-  = string / number / boolean / null / undefined / array / object / ctor / any
+  = string / number / boolean / null / undefined / array / function / object / ctor / any
 
 ctor
  = first:[A-Z] rest:[a-zA-Z0-9_$]* {return  {name: 'namedObject', ctorName: [first].concat(rest).join('')}; }
@@ -30,6 +30,10 @@ number
 
 boolean
   = ("boolean" / "bool") {return {name: 'boolean'}; }
+
+function
+  = ("function" / "func") {return {name: 'function'}; }
+
 
 null
   = "null" {return {name: 'null'}; }
