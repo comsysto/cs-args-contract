@@ -14,3 +14,10 @@ cs-args-contract uses a parser that is generated with the awsome [PEG.js](http:/
         argContract(arguments, '{name: str, newsletter: bool}, [{ruleName: str, checker: func}], func?');
         // do something useful ...
     }
+
+    checkCustomer({name: 'Peter', newsletter: true}, []); // okey
+    checkCustomer({name: 'Peter', newsletter: true, age: 15}, [{ruleName: ageRule, function(){}}]); // okey
+    checkCustomer({name: 'Peter', newsletter: 'true', age: 15}, []); // fail
+    checkCustomer({name: 'Peter', newsletter: 'true'}, ['string]); // fail
+    checkCustomer({name: 'Peter', age: 15}, []); // fail
+    // etc...
