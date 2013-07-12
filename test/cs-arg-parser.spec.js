@@ -121,4 +121,25 @@ describe('cs-args-contract', function() {
 
     });
 
+    it('should throw a exception', function() {
+        function f(){
+            checkArgs.assert(arguments, 'num, str | bool');
+        }
+
+        expect(function(){
+            f(1, 1);
+        }).toThrow();
+
+    });
+
+    it('can handle real <arguments> objects', function() {
+        function f(){
+            valid(arguments, 'str, str?, str');
+        }
+
+        f('a', 'b');
+        f('a', 'b', 'c');
+    });
+
+
 });
