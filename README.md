@@ -7,3 +7,10 @@ This library is used to check the arguments of a javascript function against a c
 cs-args-contract is provided under the [Apache Licence Version 2](https://github.com/comsysto/jenkins-bell/blob/master/LICENSE.txt)
 
 cs-args-contract uses a parser that is generated with the awsome [PEG.js](http://pegjs.majda.cz/) parser generator.
+
+# Usage #
+
+    function checkCustomer(customer, rules, notifier){
+        argContract(arguments, '{name: str, newsletter: bool}, [{ruleName: str, checker: func}], func?');
+        // do something useful ...
+    }
