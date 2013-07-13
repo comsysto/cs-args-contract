@@ -150,5 +150,9 @@ describe('cs-args-contract', function() {
         f('a', 'b', 'c');
     });
 
+    it('registers a global instance', function() {
+        expect(argsContract).toBeDefined();
+    });
+
 
 });

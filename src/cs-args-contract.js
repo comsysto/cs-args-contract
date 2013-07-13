@@ -74,12 +74,22 @@ var cs_args_contract_factory = (function() {
         return checker(type, arg);
     }
 
-    function spliceWhileTrue(collection, testFunction) {
+    /**
+     * This function splits the params array.
+     * The first part of the returned array is filled as long as the mandatory
+     * property of the elements match the mandatory function parameter.
+     *
+     * @param {Array<{mandatory: boolean}>} params
+     * @param {boolean} mandatory
+     * @returns {Array<Array<{mandatory: boolean}>>} Returns an array with the two split array parts of the input. The
+     * first part meeting the condition the second that don't meet the condition.
+     */
+    function splitByMandatory(params, mandatory) {
         var head = [];
         var tail = [];
         var testFailed = false;
-        _(collection).each(function(element) {
-            if (!testFunction(element)) {
+        _(params).each(function(element) {
+            if (element.mandatory !== mandatory) {
                 testFailed = true;
             }
             if (!testFailed) {
@@ -92,22 +102,25 @@ var cs_args_contract_factory = (function() {
         return [head, tail];
     }
 
-    function Contract(baseContract, contractString) {
+    function Contract(paramContractList) {
 
+        /**
+         * Splits the paramContractList in 3 parts.
+         * - The first part: a row of mandatory parameter contracts.
+         * - The second part: a row of non mandatory parameter contracts.
+         * - The third part: a row of mandatory parameter contracts.
+         *
+         * All parts can be empty, should a forth part of non mandatory parameter exists, a error is thrown.
+         * @returns {Array} with exact 3 elements. Each an array of param contract objects.
+         */
         function splitParts() {
-            var bothParts = spliceWhileTrue(baseContract, function(param) {
-                return param.mandatory
-            });
+            var bothParts = splitByMandatory(paramContractList, true);
             // mandatory part
             var part1 = bothParts[0];
-            bothParts = spliceWhileTrue(bothParts[1], function(param) {
-                return !param.mandatory
-            });
+            bothParts = splitByMandatory(bothParts[1], false);
             // not mandatory part
             var part2 = bothParts[0];
-            bothParts = spliceWhileTrue(bothParts[1], function(param) {
-                return param.mandatory
-            });
+            bothParts = splitByMandatory(bothParts[1], true);
             // mandatory part
             var part3 = bothParts[0];
             if (bothParts[1].length !== 0) {
@@ -168,7 +181,7 @@ var cs_args_contract_factory = (function() {
 
         this.checkArgs = function(argList) {
             if (argList.length < contractPart1.length + contractPart3.length) {
-                errorIllegalArgCount(argList);
+                errorIllegalArgCount();
             }
             var argsPart1 = argList.slice(0, contractPart1.length);
             checkMandatory(argsPart1, contractPart1, 0);
@@ -190,11 +203,24 @@ var cs_args_contract_factory = (function() {
         }
     }
 
+    /**
+     * A instance of the ctor is thrown if the contract is invalid.
+     *
+     * @param {string} code possible codes are ARG_COUNT, SYNTAX_ERROR, VARARGS_OR_OPTIONAL_NOT_IN_ROW,
+     * VARARGS_AND_OPTIONAL, MULTIPLE_VARARGS, NO_PARSER_FOUND
+     * @constructor
+     */
     function ContractError(code) {
         this.name = "ContractError";
         this.code = code.toString();
     }
 
+    /**
+     * A instance of the ctor is thrown if the arguments don't match the contract.
+     *
+     * @param {string|number} code possible codes are ARG_COUNT or the index of the argument that failed the test.
+     * @constructor
+     */
     function ContractViolation(code) {
         this.name = "ContractViolation";
         this.code = code.toString();
@@ -203,8 +229,18 @@ var cs_args_contract_factory = (function() {
 
     function Instance(){
 
+        /**
+         * caches the contract instances by its string representation.
+         * @type {{}}
+         */
         var contractCache = {};
 
+        /**
+         * Returns a cached Contract or create a new one for the contractString.
+         *
+         * @param contractString the string represetation of the contract.
+         * @return { Contract } the cached contract instance if it exists or a new one.
+         */
         function getContract(contractString) {
             var contract = contractCache[contractString];
             if (!_(contract).isUndefined()) {
@@ -254,17 +290,17 @@ var cs_args_contract_factory = (function() {
 })();
 
 (function(){
-    var originalReference = window.assertArgs;
-    window.argsContract = cs_args_contract_factory().assert;
-    window.argsContract.noConflict = function(){
+    var originalReference = this.argsContract;
+    this.argsContract = cs_args_contract_factory().assert;
+    this.argsContract.noConflict = function(){
         if(_.isUndefined(originalReference)){
-            window.argsContract = undefined;
+            this.argsContract = undefined;
             try{
-                delete window.argsContract;
+                delete this.argsContract;
             }catch(e){
-                // wierd ie bub
+                // weird ie bug throws exception on deleting stuff from window
             }
         }
-        window.argsContract = originalReference;
+        this.argsContract = originalReference;
     };
-})();
+}).call(this);
