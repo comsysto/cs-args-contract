@@ -1,4 +1,19 @@
-
+ /*
+  * Copyright 2013 Otto Krammer
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
+  */
 paramList
   = p0: param ","" "* pn: paramList { return [p0].concat(pn); }
   / p0: param { return [p0]; }
@@ -7,60 +22,69 @@ param =
   optionalParam / varargsParam / mandatoryParam
 
 type
-  = or / simpleType
+  = or / and / simpleType
 
 simpleType
-  = string / number / boolean / null / undefined / array / function / object / ctor / any
+  = string / number / boolean / function / null / undefined / array  / object / ctor / any / not / bracketed
 
-ctor
- = first:[A-Z] rest:[a-zA-Z0-9_$]* {return  {name: 'namedObject', ctorName: [first].concat(rest).join('')}; }
+string
+    = ("string" / "str") {return {name: 'string'}; }
+
+number
+    = ("number" / "num") {return {name: 'number'}; }
+
+boolean
+    = ("boolean" / "bool") {return {name: 'boolean'}; }
+
+function
+    = ("function" / "func") {return {name: 'function'}; }
+
+null
+    = "null" {return {name: 'null'}; }
 
 undefined
   = ("undefined" / "undef") {return {name: 'undefined'}; }
 
 any
-  = "any" {return {name: 'any'};}
+    = "any" {return {name: 'any'};}
 
+array
+    = "[" type:type "]" { return {name: 'array', elementType: type}; }
 
-string
-  = ("string" / "str") {return {name: 'string'}; }
+object
+    = "{" prop0:(propertyAndType)? props: (","propertyAndType)* "}"
+    {
+        var obj = {};
+        obj[prop0[0]] = prop0[1];
+        for(var i = 0; i < props.length; i+=1){
+          obj[props[i][1][0]] = props[i][1][1]
+        }
+        return {name: 'object', properties: obj};
+    }
 
-number
-  = ("number" / "num") {return {name: 'number'}; }
+propertyAndType
+    = prop:propertyName ":" type:type { return [prop, type] }
 
-boolean
-  = ("boolean" / "bool") {return {name: 'boolean'}; }
+propertyName
+    = chars:[a-zA-Z_$]+ {return chars.join('')}
 
-function
-  = ("function" / "func") {return {name: 'function'}; }
+ctor
+ = first:[A-Z] rest:[a-zA-Z0-9_$]* {return  {name: 'namedObject', ctorName: [first].concat(rest).join('')}; }
 
-
-null
-  = "null" {return {name: 'null'}; }
 
 or
   = left:simpleType "|" right:type {return {name: 'or', left: left, right: right}; }
 
-array
-  = "[" type:type "]" { return {name: 'array', elementType: type}; }
+and
+  = left:simpleType "&" right:type {return {name: 'and', left: left, right: right}; }
 
-object
-  = "{" prop0:(pair)? props: (","pair)* "}"
-{
 
-  var obj = {};
-  obj[prop0[0]] = prop0[1];
-  for(var i = 0; i < props.length; i+=1){
-    obj[props[i][1][0]] = props[i][1][1]
-  }
-  return {name: 'object', properties: obj};
-}
+not
+  = "!" type:simpleType {return {name: 'not', type: type};}
 
-pair
-  = prop:property ":" type:type { return [prop, type] }
+bracketed
+  = "(" type:type ")" { return type; }
 
-property
-  = chars:[a-zA-Z_$]+ {return chars.join('')}
 
 mandatoryParam
   = type:type {return {name: 'mandatoryParam', type: type, mandatory: true, optional: false, varargs: false};}

@@ -1,10 +1,54 @@
-var cs_args_contract_factory = (function() {
+(function() {
     /*
-     * This file is licenced under the Apache 2 Licence.
+     * Copyright 2013 Otto Krammer
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     * http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
      *
      */
 
+    //window or global
     var root = this;
+
+    // original reference to 'argsContract' just in case ;)
+    var originalReference = root.argsContract;
+
+    var lazyInstance = null;
+    root.argsContract = function(args, contractString) {
+        if (lazyInstance === null) {
+            lazyInstance = factory();
+        }
+        return lazyInstance(args, contractString);
+    };
+
+    /**
+     * factory method for testing
+     */
+    root.argsContract.factory = factory;
+
+    /**
+     * Method to restore the original value of 'argsContract' global variable
+     */
+    root.argsContract.noConflict = function() {
+        if (_.isUndefined(originalReference)) {
+            root.argsContract = undefined;
+            try {
+                delete this.argsContract;
+            } catch (e) {
+                // weird ie bug throws exception on deleting stuff from window
+            }
+        }
+        root.argsContract = originalReference;
+    };
 
     // parserHolder will be filled if the parser is injected in this source file via 'grunt'.
     var parserHolder = null;
@@ -17,7 +61,7 @@ var cs_args_contract_factory = (function() {
      * @returns {parse: function} the peg parser.
      */
     function parser() {
-        return parserHolder ? parserHolder.cs_args_contract_parser : root.cs_args_contract_parser ;
+        return parserHolder ? parserHolder.cs_args_contract_parser : root.cs_args_contract_parser;
     }
 
     /**
@@ -59,6 +103,14 @@ var cs_args_contract_factory = (function() {
             return testObjectByType(type.left, arg) || testObjectByType(type.right, arg);
         },
 
+        and: function(type, arg) {
+            return testObjectByType(type.left, arg) && testObjectByType(type.right, arg);
+        },
+
+        not: function(type, arg){
+            return ! testObjectByType(type.type, arg);
+        },
+
         array: function(type, arg) {
             return _.isArray(arg) && _.every(arg, function(value) {
                 return testObjectByType(type.elementType, value);
@@ -84,15 +136,30 @@ var cs_args_contract_factory = (function() {
         },
 
         namedObject: function(type, arg) {
-            return _.isObject(arg) && arg.constructor && arg.constructor.name === arg.ctorName;
+            return _.isObject(arg) && arg.constructor && arg.constructor.name === type.ctorName;
         }
 
     };
 
+    var errorMessagesForKey = {
+        VARARGS_AND_OPTIONAL: 'Contract Error: The contract contains varargs and optional parameter.',
+        VARARGS_OR_OPTIONAL_NOT_IN_ROW: 'Contract Error: All optional parameter must be in a row.',
+        MULTIPLE_VARARGS: 'Contract Error: Only one varargs parameter is allowed.',
+        SYNTAX_ERROR: 'Contract Error: There is a syntax error.',
+        NO_PARSER_FOUND: 'Contract Error: No parser can be found.',
+        ARG_COUNT: 'Contract Violation: Wrong number of arguments.'
+    };
 
-    function testObjectByType(type, arg) {
+
+    /**
+     * Test if an object meet its type.
+     * @param type The type defintion that is returned by the parser.
+     * @param obj A Object to test.
+     * @returns {boolean} if the object is compatible to the type definition
+     */
+    function testObjectByType(type, obj) {
         var testFunction = testFunctionForTypeName[type.name];
-        return testFunction(type, arg);
+        return testFunction(type, obj);
     }
 
     /**
@@ -123,6 +190,11 @@ var cs_args_contract_factory = (function() {
         return [head, tail];
     }
 
+    /**
+     * This function constructs a cachable object that represents a contract for an argument list.
+     * @param {Array<{}>} paramContractList A array of  param objects that are returned from the parser.
+     * @constructor
+     */
     function Contract(paramContractList) {
 
         /**
@@ -159,10 +231,19 @@ var cs_args_contract_factory = (function() {
             return [part1, part2, part3];
         }
 
+        /**
+         * Throws a ContractViolation with the key for invalid arg count.
+         */
         function errorIllegalArgCount() {
             throw new ContractViolation("ARG_COUNT");
         }
 
+        /**
+         * Checks the varargs part form an argument list by the provided list of param contracts.
+         * @param args Parts of the arguments object
+         * @param paramContracts A list of varargsParam objects returned from the parser of length 1.
+         * @param indexOffset The start index of the arguments part in the whole arguments object.
+         */
         function checkVarargs(args, paramContracts, indexOffset) {
             var typeOfVarargs = paramContracts[0].type;
             _(args).each(function(arg, index) {
@@ -174,6 +255,12 @@ var cs_args_contract_factory = (function() {
 
         }
 
+        /**
+         * Checks the optional part form an argument list by the provided list of param contracts.
+         * @param args Parts of the arguments object
+         * @param paramContracts A list of optionalParam objects returned from the parser
+         * @param indexOffset The start index of the arguments part in the whole arguments object.
+         */
         function checkOptional(args, paramContracts, indexOffset) {
             _(args).each(function(arg, index) {
                 var contract = paramContracts[index];
@@ -185,6 +272,12 @@ var cs_args_contract_factory = (function() {
             return null;
         }
 
+        /**
+         * Checks the mandatory part form an argument list by the provided list of param contracts.
+         * @param args Parts of the arguments object
+         * @param paramContracts A list of param objects returned from the parser
+         * @param indexOffset The start index of the arguments part in the whole arguments object.
+         */
         function checkMandatory(args, paramContracts, indexOffset) {
             _(paramContracts).each(function(contract, index) {
                 var arg = args[index];
@@ -200,6 +293,10 @@ var cs_args_contract_factory = (function() {
         var contractPart2 = parts[1];
         var contractPart3 = parts[2];
 
+        /**
+         * Checks the argument list against this contract.
+         * @param argList
+         */
         this.checkArgs = function(argList) {
             if (argList.length < contractPart1.length + contractPart3.length) {
                 errorIllegalArgCount();
@@ -234,6 +331,12 @@ var cs_args_contract_factory = (function() {
     function ContractError(code) {
         this.name = "ContractError";
         this.code = code.toString();
+        this.toString = function(){
+            if(this.message){
+                return this.message;
+            }
+            return name + '[' + code + ']';
+        }
     }
 
     /**
@@ -244,11 +347,56 @@ var cs_args_contract_factory = (function() {
      */
     function ContractViolation(code) {
         this.name = "ContractViolation";
-        this.code = code.toString();
+        this.code = code;
+        this.toString = function(){
+            if(this.message){
+                return this.message;
+            }
+            return name + '[' + code + ']';
+        }
     }
 
 
-    function Instance(){
+    /**
+     * This function parses the input string and returns a list of param objects.
+     * @param contractString The string representation of a contract.
+     * @returns {Array<{}>} A list of param objects from the parser.
+     */
+    function parse(contractString) {
+        if (_.isUndefined(parser()) || _.isNull(parser())) {
+            throw new ContractError("NO_PARSER_FOUND");
+        }
+        try {
+            var trimmedString = contractString.replace(/\s/g, "");
+            var baseContract = parser().parse(trimmedString);
+        } catch (e) {
+            throw new ContractError("SYNTAX_ERROR");
+        }
+        return baseContract;
+    }
+
+    /**
+     * Creates a human readable error message.
+     * @param {ContractViolation | ContractError } error The thrown error.
+     * @param {string} contract The contract string
+     * @param {Array} args The arguments that should be tested
+     * @returns {string} A human readable error message.
+     */
+    function createErrorMessage(error, contract, args){
+        var baseMessage = error.code;
+        if(_.isNumber(error.code)){
+            baseMessage = 'Contract Violation: Argument ' + error.code + ' is invalid.';
+        }else{
+            baseMessage = errorMessagesForKey[error.code];
+        }
+        return baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(args);
+    }
+
+    /**
+     * This function creates a new 'instance' of the library.
+     * This instance encloses all changeable state.
+     */
+    function factory() {
 
         /**
          * caches the contract instances by its string representation.
@@ -268,65 +416,42 @@ var cs_args_contract_factory = (function() {
                 return contract;
             }
 
-            if (_.isUndefined(parser()) || _.isNull(parser())) {
-                throw new ContractError("NO_PARSER_FOUND");
-            }
-            try {
-                var trimmedString = contractString.replace(/\s/g, "");
-                var baseContract = parser().parse(trimmedString);
-            } catch (e) {
-                throw new ContractError("SYNTAX_ERROR");
-            }
-
+            var baseContract = parse(contractString);
             contract = new Contract(baseContract, contractString);
             contractCache[contractString] = contract;
             return contract;
         }
 
 
+        /**
+         * Checks the argument list against the contract.
+         * @param argList
+         * @param contractString
+         */
         function checkArgs(argList, contractString) {
-            var contract = getContract(contractString);
-            contract.checkArgs(_.toArray(argList));
-        }
-
-
-        this._cache = contractCache;
-        this.assert = checkArgs;
-        this.validate = function(argList, contract) {
-            try {
-                checkArgs(argList, contract);
-            } catch (e) {
-                if(e.name === 'ContractError' || e.name === 'ContractViolation')
-                    return e;
+            try{
+                var contract = getContract(contractString);
+                contract.checkArgs(_.toArray(argList));
+            }catch(e){
+                if(e.name ==='ContractError' || e.name === 'ContractViolation'){
+                    e.message = createErrorMessage(e, contractString, argList);
+                }
                 throw e;
             }
-            return null;
         }
+        // make cache accessable for the test cases.
+        checkArgs._cache = contractCache;
+        return checkArgs
+
     }
 
-    (function parserSrc(){
+    /**
+     * This wrapper contains the generated parser, injected by the build process.
+     * The parser is bound to the 'this.cs_args_contract_parser' of the wrapper and is accessed via the parser()
+     * function.
+     */
+    (function parserSrc() {
         // BEGIN GENERATED PARSER @@newLine @@newLine @@parserSrc @@newLine @@newLine // END GENERATED PARSER
-        return this.cs_args_contract_parser;
     }).call(parserHolder);
 
-    return function(){
-        return new Instance();
-    }
-
-}).call(this);
-
-(function(){
-    var originalReference = this.argsContract;
-    this.argsContract = cs_args_contract_factory().assert;
-    this.argsContract.noConflict = function(){
-        if(_.isUndefined(originalReference)){
-            this.argsContract = undefined;
-            try{
-                delete this.argsContract;
-            }catch(e){
-                // weird ie bug throws exception on deleting stuff from window
-            }
-        }
-        this.argsContract = originalReference;
-    };
 }).call(this);
