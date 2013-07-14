@@ -9,11 +9,23 @@ var cs_args_contract_factory = (function() {
     // parserHolder will be filled if the parser is injected in this source file via 'grunt'.
     var parserHolder = null;
 
+    /**
+     * This function is used to lookup the parser.
+     * First the parserHolder is consulted, this field is used if the parser code is inlined via the build process.
+     * If the parser holder is null, than the global scope is used, this is case if the raw source file is used, e.g. in
+     * continuous testing via karma.
+     * @returns {parse: function} the peg parser.
+     */
     function parser() {
         return parserHolder ? parserHolder.cs_args_contract_parser : root.cs_args_contract_parser ;
     }
 
-    var checkerForType = {
+    /**
+     * In this object checking functions are keyed to there type name. The values are all functions that accept as
+     * first parameter the type object and as second parameter the object that should be tested.
+     * @type {{}}
+     */
+    var testFunctionForTypeName = {
 
         string: function(type, arg) {
             return _.isString(arg);
@@ -44,12 +56,12 @@ var cs_args_contract_factory = (function() {
         },
 
         or: function(type, arg) {
-            return checkType(type.left, arg) || checkType(type.right, arg);
+            return testObjectByType(type.left, arg) || testObjectByType(type.right, arg);
         },
 
         array: function(type, arg) {
             return _.isArray(arg) && _.every(arg, function(value) {
-                return checkType(type.elementType, value);
+                return testObjectByType(type.elementType, value);
             });
         },
 
@@ -63,7 +75,7 @@ var cs_args_contract_factory = (function() {
                 if (types.hasOwnProperty(key)) {
                     var propType = types[key];
                     var propValue = arg[key];
-                    if (!checkType(propType, propValue)) {
+                    if (!testObjectByType(propType, propValue)) {
                         return false;
                     }
                 }
@@ -78,9 +90,9 @@ var cs_args_contract_factory = (function() {
     };
 
 
-    function checkType(type, arg) {
-        var checker = checkerForType[type.name];
-        return checker(type, arg);
+    function testObjectByType(type, arg) {
+        var testFunction = testFunctionForTypeName[type.name];
+        return testFunction(type, arg);
     }
 
     /**
@@ -122,7 +134,7 @@ var cs_args_contract_factory = (function() {
          * All parts can be empty, should a forth part of non mandatory parameter exists, a error is thrown.
          * @returns {Array} with exact 3 elements. Each an array of param contract objects.
          */
-        function splitParts() {
+        function paramContractListIn3Parts() {
             var bothParts = splitByMandatory(paramContractList, true);
             // mandatory part
             var part1 = bothParts[0];
@@ -154,7 +166,7 @@ var cs_args_contract_factory = (function() {
         function checkVarargs(args, paramContracts, indexOffset) {
             var typeOfVarargs = paramContracts[0].type;
             _(args).each(function(arg, index) {
-                var result = checkType(typeOfVarargs, arg);
+                var result = testObjectByType(typeOfVarargs, arg);
                 if (!result) {
                     throw new ContractViolation(indexOffset + index + 1);
                 }
@@ -165,7 +177,7 @@ var cs_args_contract_factory = (function() {
         function checkOptional(args, paramContracts, indexOffset) {
             _(args).each(function(arg, index) {
                 var contract = paramContracts[index];
-                var result = checkType(contract.type, arg);
+                var result = testObjectByType(contract.type, arg);
                 if (!result) {
                     throw new ContractViolation(indexOffset + index + 1);
                 }
@@ -176,14 +188,14 @@ var cs_args_contract_factory = (function() {
         function checkMandatory(args, paramContracts, indexOffset) {
             _(paramContracts).each(function(contract, index) {
                 var arg = args[index];
-                var result = checkType(contract.type, arg);
+                var result = testObjectByType(contract.type, arg);
                 if (!result) {
                     throw new ContractViolation(indexOffset + index + 1);
                 }
             });
         }
 
-        var parts = splitParts();
+        var parts = paramContractListIn3Parts();
         var contractPart1 = parts[0];
         var contractPart2 = parts[1];
         var contractPart3 = parts[2];
