@@ -1,7 +1,16 @@
 var cs_args_contract_factory = (function() {
+    /*
+     * This file is licenced under the Apache 2 Licence.
+     *
+     */
+
+    var root = this;
+
+    // parserHolder will be filled if the parser is injected in this source file via 'grunt'.
+    var parserHolder = null;
 
     function parser() {
-        return window.cs_args_contract_parser;
+        return parserHolder ? parserHolder.cs_args_contract_parser : root.cs_args_contract_parser ;
     }
 
     var checkerForType = {
@@ -283,11 +292,16 @@ var cs_args_contract_factory = (function() {
         }
     }
 
+    (function parserSrc(){
+        // BEGIN GENERATED PARSER @@newLine @@newLine @@parserSrc @@newLine @@newLine // END GENERATED PARSER
+        return this.cs_args_contract_parser;
+    }).call(parserHolder);
+
     return function(){
         return new Instance();
     }
 
-})();
+}).call(this);
 
 (function(){
     var originalReference = this.argsContract;

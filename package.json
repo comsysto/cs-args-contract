@@ -1,0 +1,39 @@
+{
+  "name": "cs-args-contract",
+  "version": "0.0.1",
+  "description": "Contract checking for function arguments",
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "grunt": "~0.4.1",
+    "grunt-peg": "~0.3.0"
+  },
+  "devDependencies": {
+    "grunt-peg": "git://github.com/okrammer/grunt-peg.git",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-replace": "~0.4.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:okrammer/cs-args-contract.git"
+  },
+  "keywords": [
+    "contract",
+    "args"
+  ],
+  "author": "Otto Krammer",
+  "license": "Apache 2",
+  "gitHead": "378d8e6a6598cc8abcc584313d473c660c7c1908",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/okrammer/cs-args-contract/issues"
+  }
+}

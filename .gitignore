@@ -1,3 +1,6 @@
 *.iml
 *.log
 .idea
+dist
+generated
+node_modules

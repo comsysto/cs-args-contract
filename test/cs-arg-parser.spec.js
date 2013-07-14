@@ -70,7 +70,7 @@ describe('cs-args-contract', function() {
 
     it('can check functions', function() {
         function f(){
-        };
+        }
         valid([1, f], 'num,func');
         valid([1, f], 'num,function');
         contractViolation([1, true], 'num,func', "2");

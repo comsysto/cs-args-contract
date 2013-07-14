@@ -11,7 +11,7 @@ cs-args-contract uses a parser that is generated with the awsome [PEG.js](http:/
 # Usage #
 
     function checkCustomer(customer, rules, notifier){
-        argContract(arguments, '{name: str, newsletter: bool}, [{ruleName: str, checker: func}], func?');
+        argsContract(arguments, '{name: str, newsletter: bool}, [{ruleName: str, checker: func}], func?');
         // do something useful ...
     }
 
