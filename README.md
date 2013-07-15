@@ -30,10 +30,10 @@ a dynamic typed language.
     /**
      * Adds a handler for module with name 'name'.
      * If the handler is not supplied a already handler already registered is removed.
-     * The handler can be object that has the 'activate' and 'deactivate' function or a simple function.
+     * The handler can be object that has the 'activate' and 'deactivate' function or a simple function ...
      */
-    function setHandler(name, handler?){
-        argsContract(arguments, 'str, {activate: func, deactivate: func} | func');
+    function setHandler(name, handler){
+        argsContract(arguments, 'str, {activate: func, deactivate: func}|func ?');
         ...
     }
 
@@ -62,16 +62,16 @@ Here a more formal description of the type expressions:
 * __undef, undefined__: the undefined value
 * __any__: will match any parameter
 * __\[ TYPE \]__: an array of elements of TYPE
-* __TYPE_A | TYPE_B__: TYPE_A or TYPE_B
+* __ TYPE\_A | TYPE\_B __: TYPE\_A or TYPE\_B
 * __{ PROP: TYPE, ... }__: An object that must contain a property named PROP that has a value of type TYPE
-* __CTOR_NAME__: The name of a constructor function. The name must start with a capital letter.
-* __! TYPE__: Not the type TYPE
-* __TYPE_A & TYPE_B__: argument has to met type expression TYPE_A and TYPE_B,
+* __CTOR\_NAME__: The name of a constructor function. The name must start with a capital letter.
+* __! TYPE __: Not the type TYPE
+* __ TYPE\_A & TYPE\_B __: argument has to met type expression TYPE\_A and TYPE\_B,
 quite academic but can be used with Ctors and Object or with not in a sane way.
 
 For each parameter a type must be specified in addition the following modifier for parameters are available:
-* __TYPE? __: The parameter is optional
-* __TYPE* __ : The parameter is a vararg
+* __ TYPE\? __: The parameter is optional
+* __ TYPE\* __ : The parameter is a vararg
 
 The following rules apply to the above modifiers:
 * Vararg and optional parameter can't be used together in one parameter list.
