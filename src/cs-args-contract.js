@@ -42,7 +42,7 @@
         if (_.isUndefined(originalReference)) {
             root.argsContract = undefined;
             try {
-                delete this.argsContract;
+                delete root.argsContract;
             } catch (e) {
                 // weird ie bug throws exception on deleting stuff from window
             }

@@ -79,10 +79,11 @@ module.exports = function(grunt) {
                     variables: {
                         'newLine' : '\n',
                         'parserSrc': '<%= grunt.file.read("generated/cs-args-contract-parser.js") %>'
-                    }
+                    },
+                    force: true
                 },
                 files: [
-                    {expand: true, flatten: true, src: ['src/cs-args-contract.js'], dest: 'dist/'}
+                    {expand: true, flatten: true, src: ['src/cs-args-contract.js', 'src/cs-args-contract.min.js'], dest: 'dist/'}
                 ]
             }
         },
