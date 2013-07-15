@@ -38,46 +38,48 @@ a dynamic typed language.
     }
 
 Some examples for possible contract strings:
-* __'str'__: the argument must be a string
-* __'num'__: the argument must be a number
-* __'str, num'__: first argument must be a string, the second argument must be a number
-* __'str | num'__: the argument must be a string or a number
-* __'str | \[str\]'__: the argument must be string or an array that contains only strings
-* __'\[str | num\]'__: the argument must be an array that can contain strings or numbers.
-* __'str, num*'__: the first argument must be a string, all following arguments must be numbers.
-* __'str, num?'__: the first argument must be a string, the second argument is optional but must be a number if present.
-* __'{}'__: the argument must be an object.
-* __'{name: string}'__: the argument must be an object and must have a property called 'name' that has a string value.
-* __'{name: string, index: num | undef}'__: the argument must be an object and must have a property called 'name' that
+
++ __'str'__: the argument must be a string
++ __'num'__: the argument must be a number
++ __'str, num'__: first argument must be a string, the second argument must be a number
++ __'str | num'__: the argument must be a string or a number
++ __'str | \[str\]'__: the argument must be string or an array that contains only strings
++ __'\[str | num\]'__: the argument must be an array that can contain strings or numbers.
++ __'str, num*'__: the first argument must be a string, all following arguments must be numbers.
++ __'str, num?'__: the first argument must be a string, the second argument is optional but must be a number if present.
++ __'{}'__: the argument must be an object.
++ __'{name: string}'__: the argument must be an object and must have a property called 'name' that has a string value.
++ __'{name: string, index: num | undef}'__: the argument must be an object and must have a property called 'name' that
  has a string value and a optional property named index that must be a number if present.
-* __'Customer'__: the argument must be an object who's constructor name is 'Customer'
++ __'Customer'__: the argument must be an object who's constructor name is 'Customer'
 
 The examples above can be combined in any way.
 Here a more formal description of the type expressions:
-* __str, string__: a string
-* __num, number__: a number
-* __bool, boolean__: a boolean
-* __fun, function__: a function
-* __null__: the null value
-* __undef, undefined__: the undefined value
-* __any__: will match any parameter
-* __\[ TYPE \]__: an array of elements of TYPE
-* __ TYPE\_A | TYPE\_B __: TYPE\_A or TYPE\_B
-* __{ PROP: TYPE, ... }__: An object that must contain a property named PROP that has a value of type TYPE
-* __CTOR\_NAME__: The name of a constructor function. The name must start with a capital letter.
-* __! TYPE __: Not the type TYPE
-* __ TYPE\_A & TYPE\_B __: argument has to met type expression TYPE\_A and TYPE\_B,
+
++ __str, string__: a string
++ __num, number__: a number
++ __bool, boolean__: a boolean
++ __fun, function__: a function
++ __null__: the null value
++ __undef, undefined__: the undefined value
++ __any__: will match any parameter
++ __\[ TYPE \]__: an array of elements of TYPE
++ **TYPE\_A | TYPE\_B**: TYPE\_A or TYPE\_B
++ __{ PROP: TYPE, ... }__: An object that must contain a property named PROP that has a value of type TYPE
++ **CTOR_NAME**: The name of a constructor function. The name must start with a capital letter.
++ **! TYPE**: Not the type TYPE
++ **TYPE\_A & TYPE\_B**: argument has to met type expression TYPE\_A and TYPE\_B,
 quite academic but can be used with Ctors and Object or with not in a sane way.
 
 For each parameter a type must be specified in addition the following modifier for parameters are available:
-* __ TYPE\? __: The parameter is optional
-* __ TYPE\* __ : The parameter is a vararg
++ **TYPE\?**: The parameter is optional
++ **TYPE\*** : The parameter is a vararg
 
 The following rules apply to the above modifiers:
-* Vararg and optional parameter can't be used together in one parameter list.
-* Only one parameter can be declared vararg in a parameter list.
-* All optional parameters have to be in a row.
-* Optinal parameter are matched from left to right.
++ Vararg and optional parameter can't be used together in one parameter list.
++ Only one parameter can be declared vararg in a parameter list.
++ All optional parameters have to be in a row.
++ Optinal parameter are matched from left to right.
 
 
 
