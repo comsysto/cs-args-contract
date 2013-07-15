@@ -72,8 +72,9 @@ Here a more formal description of the type expressions:
 quite academic but can be used with Ctors and Object or with not in a sane way.
 
 For each parameter a type must be specified in addition the following modifier for parameters are available:
-+ **TYPE\?**: The parameter is optional
-+ **TYPE\*** : The parameter is a vararg
+
++ **TYPE?**: The parameter is optional
++ __TYPE*__ : The parameter is a vararg
 
 The following rules apply to the above modifiers:
 + Vararg and optional parameter can't be used together in one parameter list.
