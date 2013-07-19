@@ -1,6 +1,5 @@
 *.iml
 *.log
 .idea
-dist
-generated
+build
 node_modules

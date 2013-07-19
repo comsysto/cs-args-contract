@@ -8,14 +8,15 @@
   },
   "dependencies": {
     "grunt": "~0.4.1",
-    "grunt-peg": "~0.3.0"
+    "grunt-peg": "0.3.0"
   },
   "devDependencies": {
-    "grunt-peg": "git://github.com/okrammer/grunt-peg.git",
+    "grunt-peg": "0.3.0",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-watch": "~0.4.4",
     "grunt-replace": "~0.4.4",
-    "grunt-karma": "~0.4.5"
+    "grunt-karma": "~0.4.5",
+    "grunt-curl": "~1.1.1"
   },
   "scripts": {
     "test": "karma run"

@@ -10,8 +10,8 @@ basePath = '';
 files = [
     JASMINE,
     JASMINE_ADAPTER,
-    'lib/underscore.js',
-    'generated/cs-args-contract-parser.js',
+    'build/underscore.js',
+    'build/cs-args-contract-parser.js',
     'src/cs-args-contract.js',
     'test/*.spec.js'
 ];

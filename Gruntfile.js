@@ -65,7 +65,7 @@ module.exports = function(grunt) {
             options: { trackLineAndColumn: false },
             cs_args_contract_parser: {
                 src: "src/cs-args-contract-parser.peg",
-                dest: "generated/cs-args-contract-parser.js",
+                dest: "build/cs-args-contract-parser.js",
                 options: {
                     exportVar: "this.cs_args_contract_parser",
                     cache: false,
@@ -77,8 +77,8 @@ module.exports = function(grunt) {
             dist: {
                 options: {
                     variables: {
-                        'newLine' : '\n',
-                        'parserSrc': '<%= grunt.file.read("generated/cs-args-contract-parser.js") %>'
+                        'newLine': '\n',
+                        'parserSrc': '<%= grunt.file.read("build/cs-args-contract-parser.js") %>'
                     },
                     force: true
                 },
@@ -94,6 +94,9 @@ module.exports = function(grunt) {
                 singleRun: true,
                 browsers: ['PhantomJS']
             }
+        },
+        curl: {
+            'build/underscore.js': 'http://underscorejs.org/underscore.js'
         }
     });
 
@@ -103,8 +106,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-peg');
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-curl');
 
     // Default task.
-    grunt.registerTask('default', ['peg', 'jshint', 'karma', 'replace']);
+    grunt.registerTask('default', ['curl', 'peg', 'jshint', 'karma', 'replace']);
 
 };
