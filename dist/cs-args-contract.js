@@ -329,6 +329,7 @@
      * @constructor
      */
     function ContractError(code) {
+        Error.call(this);
         this.name = "ContractError";
         this.code = code.toString();
         this.toString = function(){
@@ -336,7 +337,7 @@
                 return this.message;
             }
             return name + '[' + code + ']';
-        }
+        };
     }
 
     /**
@@ -346,6 +347,7 @@
      * @constructor
      */
     function ContractViolation(code) {
+        Error.call(this);
         this.name = "ContractViolation";
         this.code = code;
         this.toString = function(){
@@ -353,9 +355,8 @@
                 return this.message;
             }
             return name + '[' + code + ']';
-        }
+        };
     }
-
 
     /**
      * This function parses the input string and returns a list of param objects.
@@ -389,7 +390,7 @@
         }else{
             baseMessage = errorMessagesForKey[error.code];
         }
-        return baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(args);
+        return baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(_(args).toArray());
     }
 
     /**
@@ -435,6 +436,8 @@
             }catch(e){
                 if(e.name ==='ContractError' || e.name === 'ContractViolation'){
                     e.message = createErrorMessage(e, contractString, argList);
+                    // find a better way to create a stacktrace
+                    e.stack = (new Error()).stack;
                 }
                 throw e;
             }
