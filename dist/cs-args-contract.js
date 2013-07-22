@@ -1079,7 +1079,9 @@
         if (result0 !== null) {
           result0 = (function(offset, prop0, props) {
                 var obj = {};
-                obj[prop0[0]] = prop0[1];
+                if(typeof(prop0[0]) !== 'undefined'){
+                    obj[prop0[0]] = prop0[1];
+                }
                 for(var i = 0; i < props.length; i+=1){
                   obj[props[i][1][0]] = props[i][1][1]
                 }

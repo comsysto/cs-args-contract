@@ -92,6 +92,13 @@ describe('cs-args-contract', function() {
         contractViolation([1, {}], 'num,func', 2);
     });
 
+    it('can check objects', function() {
+        valid([{}], '{}');
+        valid([{name: 'peter'}], '{}');
+        valid([{name: 'peter'}], '{name: str}');
+        contractViolation([{}], '{name: str}', 1);
+    });
+
     it('can check constructors', function() {
         function Customer() {
         }
