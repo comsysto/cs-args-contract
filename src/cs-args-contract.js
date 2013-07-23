@@ -136,7 +136,7 @@
         },
 
         namedObject: function(type, arg) {
-            return _.isObject(arg) && arg.constructor && arg.constructor.name === type.ctorName;
+            return _.isObject(arg) && arg.constructor && constructorName(arg) === type.ctorName;
         }
 
     };
@@ -149,6 +149,11 @@
         NO_PARSER_FOUND: 'Contract Error: No parser can be found.',
         ARG_COUNT: 'Contract Violation: Wrong number of arguments.'
     };
+
+
+    function constructorName(object){
+        return object.constructor.toString().match(/function ([A-Z]{1}[a-zA-Z]*)/)[1];
+    }
 
 
     /**

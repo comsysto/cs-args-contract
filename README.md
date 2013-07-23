@@ -82,7 +82,10 @@ The following rules apply to the above modifiers:
 + All optional parameters have to be in a row.
 + Optinal parameter are matched from left to right.
 
-
+# Browser Support #
+* IE 8
+* Chrome
+* Firefox
 
 # Licences #
 cs-args-contract is provided under the [Apache Licence Version 2](https://github.com/okrammer/cs-args-contract/blob/master/LICENSE.txt)
