@@ -329,15 +329,8 @@
      * @constructor
      */
     function ContractError(code) {
-        Error.call(this);
         this.name = "ContractError";
-        this.code = code.toString();
-        this.toString = function(){
-            if(this.message){
-                return this.message;
-            }
-            return name + '[' + code + ']';
-        };
+        this.code = code;
     }
 
     /**
@@ -347,15 +340,8 @@
      * @constructor
      */
     function ContractViolation(code) {
-        Error.call(this);
         this.name = "ContractViolation";
         this.code = code;
-        this.toString = function(){
-            if(this.message){
-                return this.message;
-            }
-            return name + '[' + code + ']';
-        };
     }
 
     /**
@@ -381,16 +367,21 @@
      * @param {ContractViolation | ContractError } error The thrown error.
      * @param {string} contract The contract string
      * @param {Array} args The arguments that should be tested
-     * @returns {string} A human readable error message.
+     * @returns {Error} A human readable error message.
      */
-    function createErrorMessage(error, contract, args){
+    function createError(error, contract, args){
         var baseMessage = error.code;
         if(_.isNumber(error.code)){
             baseMessage = 'Contract Violation: Argument ' + error.code + ' is invalid.';
         }else{
             baseMessage = errorMessagesForKey[error.code];
         }
-        return baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(_(args).toArray());
+        var newError = new Error(baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(_(args).toArray()));
+        newError.name = error.name;
+        newError.code = error.code;
+        newError.contract = contract;
+        newError.arguments = args;
+        return  newError;
     }
 
     /**
@@ -435,9 +426,8 @@
                 contract.checkArgs(_.toArray(argList));
             }catch(e){
                 if(e.name ==='ContractError' || e.name === 'ContractViolation'){
-                    e.message = createErrorMessage(e, contractString, argList);
                     // find a better way to create a stacktrace
-                    e.stack = (new Error()).stack;
+                    e = createError(e, contractString, argList);
                 }
                 throw e;
             }
