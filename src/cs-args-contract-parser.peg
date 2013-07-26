@@ -14,17 +14,26 @@
   * limitations under the License.
   *
   */
+
 paramList
-  = p0: param ","" "* pn: paramList { return [p0].concat(pn); }
-  / p0: param { return [p0]; }
+  = ws p0:param ws "," ws pn:paramList ws { return [p0].concat(pn); }
+  / ws p0:param ws { return [p0]; }
 
 param =
   optionalParam / varargsParam / mandatoryParam
 
-type
+
+expression = chars: [^}]+ { return chars.join(''); }
+
+complexType
   = or / and / simpleType
 
 simpleType
+  = not
+  / type:nativeType ws "{{" expression:expression "}}" { type.expression = expression; return type; }
+  / nativeType
+
+nativeType
   = string / number / boolean / function / null / undefined / array  / object / ctor / any / not / bracketed
 
 string
@@ -49,23 +58,23 @@ any
     = "any" {return {name: 'any'};}
 
 array
-    = "[" type:type "]" { return {name: 'array', elementType: type}; }
+    = "[" ws type:complexType ws "]" { return {name: 'array', elementType: type}; }
 
 object
-    = "{" prop0:(propertyAndType)? props: (","propertyAndType)* "}"
+    = "{" ws prop0:(propertyAndType)? ws props:( ws "," ws propertyAndType)* ws "}"
     {
         var obj = {};
         if(typeof(prop0[0]) !== 'undefined'){
             obj[prop0[0]] = prop0[1];
         }
         for(var i = 0; i < props.length; i+=1){
-          obj[props[i][1][0]] = props[i][1][1]
+          obj[props[i][3][0]] = props[i][3][1]
         }
         return {name: 'object', properties: obj};
     }
 
 propertyAndType
-    = prop:propertyName ":" type:type { return [prop, type] }
+    = prop:propertyName ws ":" ws  type:complexType { return [prop, type] }
 
 propertyName
     = chars:[a-zA-Z_$]+ {return chars.join('')}
@@ -75,26 +84,27 @@ ctor
 
 
 or
-  = left:simpleType "|" right:type {return {name: 'or', left: left, right: right}; }
+  = left:simpleType ws "|" ws right:complexType {return {name: 'or', left: left, right: right}; }
 
 and
-  = left:simpleType "&" right:type {return {name: 'and', left: left, right: right}; }
+  = left:simpleType ws "&" ws right:complexType {return {name: 'and', left: left, right: right}; }
 
 
 not
-  = "!" type:simpleType {return {name: 'not', type: type};}
+  = "!" ws type:simpleType {return {name: 'not', type: type};}
 
 bracketed
-  = "(" type:type ")" { return type; }
+  = "(" ws type:complexType ws ")" { return type; }
 
 
 mandatoryParam
-  = type:type {return {name: 'mandatoryParam', type: type, mandatory: true, optional: false, varargs: false};}
+  = type:complexType {return {name: 'mandatoryParam', type: type, mandatory: true, optional: false, varargs: false};}
 
 
 varargsParam
-  = type:type "*" {return {name: 'varargsParam', type: type, mandatory: false, optional: false, varargs: true};}
+  = type:complexType ws "*" {return {name: 'varargsParam', type: type, mandatory: false, optional: false, varargs: true};}
 
 optionalParam
-  = type:type "?"  { return {name: 'optionalParam', type: type, mandatory: false, optional: true, varargs: false};}
+  = type:complexType ws "?"  { return {name: 'optionalParam', type: type, mandatory: false, optional: true, varargs: false};}
 
+ws = " "*

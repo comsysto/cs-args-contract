@@ -16,7 +16,7 @@ So I take a little inspiration from the JsDocs syntax for describing types in a 
 a dynamic typed language.
 
 # Usage #
-
+### Examples ###
     function sayHello(name){
         argsContract(arguments, 'str');
         ...
@@ -54,7 +54,8 @@ Some examples for possible contract strings:
 + __'Customer'__: the argument must be an object who's constructor name is 'Customer'
 
 The examples above can be combined in any way.
-Here a more formal description of the type expressions:
+
+### Simple Types: ###
 
 + __str, string__: a string
 + __num, number__: a number
@@ -64,9 +65,12 @@ Here a more formal description of the type expressions:
 + __undef, undefined__: the undefined value
 + __any__: will match any parameter
 + __\[ TYPE \]__: an array of elements of TYPE
-+ **TYPE\_A | TYPE\_B**: TYPE\_A or TYPE\_B
 + __{ PROP: TYPE, ... }__: An object that must contain a property named PROP that has a value of type TYPE
 + **CTOR_NAME**: The name of a constructor function. The name must start with a capital letter.
+
+### Complex Types: ###
+
++ **TYPE\_A | TYPE\_B**: TYPE\_A or TYPE\_B
 + **! TYPE**: Not the type TYPE
 + **TYPE\_A & TYPE\_B**: argument has to met type expression TYPE\_A and TYPE\_B,
 quite academic but can be used with Ctors and Object or with not in a sane way.
@@ -81,6 +85,20 @@ The following rules apply to the above modifiers:
 + Only one parameter can be declared vararg in a parameter list.
 + All optional parameters have to be in a row.
 + Optinal parameter are matched from left to right.
+
+### Expressions: ###
+Every SimpleType can be followed by a expression in {{}} e.g. TYPE {{ EXPR }}
+This EXPR is a javascript expression, if the expression is evaluated to a falsy value the contract is violated.
+The object that is matched by the TYPE is exposed after the type check to the expression as $$.
+For example to test if all elements of an array are numbers and are greater than zero:
+
+    argsContract(arguments, '[ num {{ $$ > 0 }} ]');
+
+Another feature is that you can express requirements between arguments by specifing additional arguments by the argsContract call.
+The additional arguments must be strings and are evaluated to a truthy value. The arguemnts of the mehtod are bound to $1 - $9.
+For example to specify that the first argument must be less or equal that the secound argument:
+
+    argsContract(arguments, 'num, num', '$1 <= $2');
 
 # Browser Support #
 * IE 8

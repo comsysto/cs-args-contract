@@ -6,33 +6,35 @@ describe('cs-args-contract', function() {
         testee = argsContract.factory();
     });
 
-    function valid(args, contract) {
+    function valid() {
         // don't throw anything ;)
-        testee(args, contract);
+        testee.apply(null, arguments);
     }
 
-    function contractViolation(args, contract, code){
+    function contractViolation(){
         var result = null;
+        var testeeArgs = _(arguments).toArray().slice(0, arguments.length -1 );
         try{
-            testee(args, contract);
+            testee.apply(null, testeeArgs);
         }catch(e){
             result = e;
         }
         expect(result).not.toBeNull();
         expect(result.name).toBe("ContractViolation");
-        expect(result.code).toBe(code);
+        expect(result.code).toBe(arguments[arguments.length - 1]);
     }
 
-    function contractError(args, contract, code) {
+    function contractError() {
         var result = null;
+        var testeeArgs = _(arguments).toArray().slice(0, arguments.length -1 );
         try{
-            testee(args, contract);
+            testee.apply(null, testeeArgs);
         }catch(e){
             result = e;
         }
         expect(result).not.toBeNull();
         expect(result.name).toBe("ContractError");
-        expect(result.code).toBe(code);
+        expect(result.code).toBe(arguments[arguments.length - 1]);
     }
 
     it('registers a global instance', function() {
@@ -123,13 +125,13 @@ describe('cs-args-contract', function() {
         contractViolation([undefined], '!undef', 1);
     });
 
-    it('can use brackets to change priority', function() {
+    it('can use () to change priority', function() {
         valid(['blub'], '! null | undefined');
         contractViolation([null], '! (null | undefined)', 1);
         contractViolation([undefined], '! (null | undefined)', 1);
     });
 
-    it('can use and for academic purpose', function() {
+    it('can use & for academic purpose', function() {
         valid(['blbbb'], '!null & !undefined');
         contractViolation([null], '!null & !undefined', 1);
         contractViolation([undefined], '!null & !undefined', 1);
@@ -141,6 +143,21 @@ describe('cs-args-contract', function() {
         contractViolation([new Customer(3)], 'Customer & {name: string}', 1);
         contractViolation([{name: 'hans'}], 'Customer & {name: string}', 1);
 
+    });
+
+    it('can evaluate expressions', function() {
+        valid([1, 3], 'num{{$$ < 2}}, num{{$$ > 2}}');
+        contractViolation([2, 3], 'num{{$$ < 2}}, num{{$$ > 2}}', 1);
+        valid([[2, 3, 4, 5, 6], "blub"], '[num{{$$ < 10}}], str{{$$.indexOf("b") === 0}}');
+        contractViolation([[2, 3, 4, 5, 6, 10], "blub"], '[num{{$$ < 10}}], str{{$$.indexOf("b") === 0}}', 1);
+        contractViolation([[2, 3, 4, 5, 6], "lub"], '[num{{$$ < 10}}], str{{$$.indexOf("b") === 0}}', 2);
+    });
+
+    it('can evaluate argList expressions', function() {
+        valid([2, 3], 'num{{$$ % 2 === 0}}, num{{$$ % 2 === 1}}', '$1 < $2');
+        contractViolation([4, 3], 'num{{$$ % 2 === 0}}, num{{$$ % 2 === 1}}', '$1 < $2', 'EXPRESSION_ARGS');
+        contractViolation([2, 9], 'num{{$$ % 2 === 0}}, num{{$$ % 2 === 1}}', '$1 < $2', '$1 + $2 < 10', 'EXPRESSION_ARGS');
+        valid([2, 7], 'num{{$$ % 2 === 0}}, num{{$$ % 2 === 1}}', '$1 < $2', '$1 + $2 < 10');
     });
 
 
