@@ -160,6 +160,14 @@ describe('cs-args-contract', function() {
         valid([2, 7], 'num{{$$ % 2 === 0}}, num{{$$ % 2 === 1}}', '$1 < $2', '$1 + $2 < 10');
     });
 
+    it('can evaluate expressions with special functions', function() {
+        valid([[2, 3, 4, 5, 6], "blub"], '[num]{{len() < 6}}, str');
+        contractViolation([[2, 3, 4, 5, 6, 10], "blub"], '[num]{{len() < 6}}, str', 1);
+        valid([[2, 3, 4, 5, 6], "blub"], '[num], str{{re(/^b.*/)}}');
+        contractViolation([[2, 3, 4, 5, 6], "lub"], '[num], str {{ re("^b.*/") }}', 2);
+    });
+
+
 
     it('can complicated stuff', function() {
         var contract = 'num, str | [ {name: str, age:number} | {alias: string | {name: string}} ], bool?, number?';
