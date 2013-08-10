@@ -170,7 +170,7 @@
             },
 
             namedObject: function(type, arg) {
-                return _.isObject(arg) && arg.constructor && constructorName(arg) === type.ctorName;
+                return _.isObject(arg) && _.isFunction(arg.constructor) && functionName(arg.constructor) === type.ctorName;
             }
 
         };
@@ -188,8 +188,9 @@
         };
 
 
-        function constructorName(object) {
-            return object.constructor.toString().match(/function ([A-Z]{1}[a-zA-Z]*)/)[1];
+        function functionName(func) {
+            var match = func.toString().match(/function\s+([^\s\(]+)/);
+            return match ? match[1] : '';
         }
 
 

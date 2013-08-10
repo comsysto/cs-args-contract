@@ -107,9 +107,13 @@ describe('cs-args-contract', function() {
         function f(){
         }
 
+        var NoNamedCtor = function(){};
+
         valid([4, new Customer()], 'num,Customer');
         contractViolation([1, f], 'num,Customer', 2);
         contractViolation([1, {}], 'num,Customer', 2);
+        // Can't check this because the function has no name...
+        contractViolation([1, new NoNamedCtor()], 'num, NoNamedCtor', 2);
     });
 
     it('can negate types', function() {
