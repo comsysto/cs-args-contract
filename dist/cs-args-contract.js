@@ -20,11 +20,29 @@
      * Eval wrapper that has nothing internal in scope...
      * @param expression
      */
-    function evalExpression($$){
+    function evalTypeExpression($$){
+
+        // simple regex function
+        function re(regex){
+            if(_.isString(regex)){
+                regex = new RegExp(regex);
+            }
+            return regex.test($$)
+        }
+
+        // simple length function
+        function len(){
+            return $$.length;
+        }
+
         return eval(this.toString());
     }
 
-    function evalArgsExpression($1, $2, $3, $4, $5, $6, $7, $8, $9){
+    /**
+     * Eval wrapper that has nothing internal in scope...
+     * @param expression
+     */
+    function evalArgListExpression($1, $2, $3, $4, $5, $6, $7, $8, $9){
         return eval(this.toString());
     }
 
@@ -152,7 +170,7 @@
             },
 
             namedObject: function(type, arg) {
-                return _.isObject(arg) && arg.constructor && constructorName(arg) === type.ctorName;
+                return _.isObject(arg) && _.isFunction(arg.constructor) && functionName(arg.constructor) === type.ctorName;
             }
 
         };
@@ -170,8 +188,9 @@
         };
 
 
-        function constructorName(object) {
-            return object.constructor.toString().match(/function ([A-Z]{1}[a-zA-Z]*)/)[1];
+        function functionName(func) {
+            var match = func.toString().match(/function\s+([^\s\(]+)/);
+            return match ? match[1] : '';
         }
 
 
@@ -186,7 +205,7 @@
             var testResult = testFunction(type, obj);
             if(testResult && !_.isUndefined(type.expression)){
                 try{
-                    return evalExpression.call(type.expression, obj);
+                    return evalTypeExpression.call(type.expression, obj);
                 }catch(e){
                     var contractError = new ContractError('EXPRESSION_ERROR');
                     contractError.expression = type.expression;
@@ -466,7 +485,7 @@
                     contract.checkArgs(_.toArray(argList));
                     var expressions = _(arguments).toArray().slice(2, arguments.length);
                     _(expressions).each(function(expression){
-                        if(!evalArgsExpression.apply(expression, argList)){
+                        if(!evalArgListExpression.apply(expression, argList)){
                             throw {name: 'ContractViolation', code: 'EXPRESSION_ARGS', expression: expression};
                         }
                     });
