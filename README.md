@@ -5,11 +5,11 @@ This library is used to check the arguments of a javascript function against a c
 
 # Motivation #
 
-Don't you wish you could specify some kind of a method signiture in javascript? So you can make sure that the arguments
+Don't you wish you could specify some kind of a method signature in javascript? So you can make sure that the arguments
 you are processing are of the types you expect them to be or even are defined?
 
 I often caught myself checking input parameter for sanity especially on module boundaries, trying to catch this 'undefined'
-value before it would find its way deeper into the system and you would run into an 'undefiend is not a function' error
+value before it would find its way deeper into the system and you would run into an 'undefined is not a function' error
 or something like this with no idea where this wrong value have sneaked in.
 
 So I borrowed some ideas from the whole 'Programming by Contract' thing and took a little inspiration from the JsDocs
@@ -74,35 +74,39 @@ The examples above can be combined in any way.
 
 + **TYPE\_A | TYPE\_B**: TYPE\_A or TYPE\_B
 + **! TYPE**: Not the type TYPE
-+ **TYPE\_A & TYPE\_B**: argument has to met type expression TYPE\_A and TYPE\_B,
-quite academic but can be used with Ctors and Object or with not in a sane way.
++ **TYPE\_A & TYPE\_B**: argument has to satisfy type expression TYPE\_A and TYPE\_B,
+quite academic but can be used with constructor functions and objects or with the 'not' modifier in a sane way.
 
 ### Parameter Modifiers ###
-For each parameter a type must be specified in addition the following modifier for parameters are available:
+For each parameter a type must be specified, further the following modifier for parameters are available:
 
 + **TYPE?**: The parameter is optional
 + __TYPE*__ : The parameter is a vararg
 
-The following rules apply to the above modifiers:
+The following rules apply to the above mentioned modifiers:
 
 + Vararg and optional parameter can't be used together in one parameter list.
 + Only one parameter can be declared vararg in a parameter list.
 + All optional parameters have to be in a row.
-+ Optinal parameter are matched from left to right.
++ Optional parameter are matched from left to right.
 
 ### Expressions ###
-Every SimpleType can be followed by a condition in {{}} e.g. TYPE {{ COND }}
-This COND is a javascript expression that if evaluated must be a truthy value that the condition holds true.
-If this condition is evaluated to a falsy value the contract is violated.
-The object that is matched by the TYPE is exposed after the type check to the expression as the variable $$.
-For example to test if all elements of an array are numbers and are greater than zero you can express it this way:
+Every SimpleType can be followed by a condition in double curly brackets:
+
+**TYPE {{ COND }}**
+
+This COND is a javascript expression that, if evaluated, must be a truthy value that the condition holds true.
+If this condition is evaluated to a falsy value, the contract is violated.
+The object that is matched by the TYPE is exposed to the expression as the variable $$
+after the type has been successfully checked.
+For example: To test if all elements of an array are numbers and are greater than zero you can express it this way:
 
     argsContract(arguments, '[ num {{ $$ > 0 }} ]');
 
-Another feature is that you can express requirements between arguments by suppling additional arguments to the
-argsContract call. The additional arguments must be strings and contains expressions that are evaluated to a truthy value.
-The arguemnts of the mehtod are bound to the variables $1 - $9.
-For example to specify that the first argument must be less or equal that the secound argument you can do it like this:
+Another feature is that you can express requirements between arguments by supplying additional arguments to the
+argsContract call. The additional arguments must be strings and contain expressions that are evaluated to a truthy value.
+The arguments of the method are bound to the variables $1 - $9.
+For example: To specify that the first argument must be less or equal than the second argument you can express it like that:
 
     argsContract(arguments, 'num, num', '$1 <= $2');
 
