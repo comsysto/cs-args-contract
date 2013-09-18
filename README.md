@@ -115,6 +115,10 @@ For example: To specify that the first argument must be less or equal than the s
 * Chrome
 * Firefox
 
+# Distributed Files #
+The 'dist' directory of the project contains the files that can be included in an project.
+Because the contract checks are most useful in development stage and the source file with the generated parser is quite large
+
 # Licences #
 cs-args-contract is provided under the [Apache Licence Version 2](https://github.com/okrammer/cs-args-contract/blob/master/LICENSE.txt)
 
