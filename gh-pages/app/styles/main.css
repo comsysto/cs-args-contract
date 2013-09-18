@@ -1,0 +1,43 @@
+/*body {*/
+    /*background: #fafafa;*/
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    /*color: #333;*/
+/*}*/
+
+/*.hero-unit {*/
+    /*margin: 50px auto 0 auto;*/
+    /*width: 300px;*/
+    /*font-size: 18px;*/
+    /*font-weight: 200;*/
+    /*line-height: 30px;*/
+    /*background-color: #eee;*/
+    /*border-radius: 6px;*/
+    /*padding: 60px;*/
+/*}*/
+
+/*.hero-unit h1 {*/
+    /*font-size: 60px;*/
+    /*line-height: 1;*/
+    /*letter-spacing: -1px;*/
+/*}*/
+
+td.input-cell > textarea{
+    width: 95%;
+}
+
+td.input-cell {
+    padding: 5px
+}
+
+.result-valid {
+    font-weight: bolder;
+    color: green;
+}
+
+.result-invalid {
+    font-weight: bolder;
+    color: red;
+}
+.ignore-ws{
+    white-space: normal;
+}

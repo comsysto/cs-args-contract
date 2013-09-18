@@ -435,7 +435,7 @@
                 baseMessage = baseMessage + "Expression failed: {" + error.expression + "}";
             }
 
-            var newError = new Error(baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(_(args).toArray()));
+            var newError = new Error(baseMessage + ' Contract: \'' + contract + '\' Arguments: ' + JSON.stringify(_(args).toArray()));
             newError.name = error.name;
             newError.code = error.code;
             newError.contract = contract;

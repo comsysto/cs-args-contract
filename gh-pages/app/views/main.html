@@ -1,0 +1,48 @@
+<div class="hero-unit">
+  <h1>args-contract <br />
+      <small>Define contracts for arguments in javascript in flexible way ...</small>
+  </h1>
+
+</div>
+<div class="page-header">
+        <h2>Give it a try ... <small>by clicking on the links to change the value</small></h2>
+    </div>
+    </div>
+</div>
+<div class="row">
+    <div class="span3">
+        <h4 class="">Change the Contract:</h4>
+    </div>
+    <div class="span9">
+<pre>
+function doSomething(...){
+    argsContract(arguemnts, '<a xeditable href="javascript:;" id="contract-input" data-pk="1" data-type="textarea" data-name="contract"
+   data-ng-model="contract" data-placement="right" data-placeholder="Required" data-showbuttons="true"
+   data-original-title="Enter a contract" class="editable editable-click"
+        >{{contract}}</a>');
+}
+</pre>
+    </div>
+</div>
+<div class="row">
+        <div class="span3">
+            <h4>Change the Arguemnts:</h4>
+        </div>
+        <div class="span9">
+ <pre>
+doSomething(<a xeditable href="javascript:;" id="parameter-input" data-pk="1" data-type="textarea" data-name="parameter"
+               data-ng-model="parameter" data-placement="right" data-placeholder="Required" data-showbuttons="true"
+               data-original-title="Enter arguments" class="editable editable-click"
+         >{{parameter}}</a>);
+</pre>
+    </div>
+
+</div>
+<div class="row">
+    <div class="span3">
+        <h4>See the Result:</h4>
+    </div>
+    <div class="span9">
+     <pre class="ignore-ws"><span class="result-valid" ng-show="error == null">Valid :)</span><span class="result-invalid" ng-hide="error == null">{{ error }}</span></pre>
+    </div>
+</div>
