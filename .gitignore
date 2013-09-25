@@ -9,4 +9,5 @@ gh-pages/.tmp
 gh-pages/app/.sass-cache
 gh-pages/app/bower_components
 gh-pages/app/dist
+out
 

@@ -129,6 +129,14 @@
                 return _.isNumber(arg);
             },
 
+            date: function(type, arg){
+                return _.isDate(arg);
+            },
+
+            regex: function(type, arg){
+                return _.isRegExp(arg);
+            },
+
             'function': function(type, arg) {
                 return _.isFunction(arg);
             },
@@ -162,6 +170,21 @@
                         var propType = types[key];
                         var propValue = arg[key];
                         if (!testObjectByType(propType, propValue)) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
+
+            hash: function(type, arg) {
+                if (!_.isObject(arg)) {
+                    return false;
+                }
+
+                for (var key in arg) {
+                    if (arg.hasOwnProperty(key)) {
+                        if (!testObjectByType(type.valueType, arg[key])) {
                             return false;
                         }
                     }

@@ -1,48 +1,55 @@
 <div class="hero-unit">
-  <h1>args-contract <br />
-      <small>Define contracts for arguments in javascript in flexible way ...</small>
-  </h1>
+    <h1>args-contract <br/>
+        <small>Define contracts for arguments in javascript in flexible way ...</small>
+    </h1>
 
 </div>
 <div class="page-header">
-        <h2>Give it a try ... <small>by clicking on the links to change the value</small></h2>
-    </div>
-    </div>
+    <h2>Give it a try ...
+        <small>by clicking on the links to change the value</small>
+    </h2>
 </div>
-<div class="row">
-    <div class="span3">
-        <h4 class="">Change the Contract:</h4>
+</div>
+</div>
+<div class="row step-row">
+    <div class="span4 step-head">
+        1. Change the Contract:
     </div>
-    <div class="span9">
+    <div class="span8">
 <pre>
 function doSomething(...){
-    argsContract(arguemnts, '<a xeditable href="javascript:;" id="contract-input" data-pk="1" data-type="textarea" data-name="contract"
-   data-ng-model="contract" data-placement="right" data-placeholder="Required" data-showbuttons="true"
-   data-original-title="Enter a contract" class="editable editable-click"
+    argsContract(arguemnts, '<a xeditable href="javascript:;" id="contract-input" data-pk="1" data-type="textarea"
+                                data-name="contract"
+                                data-ng-model="contract" data-placement="right" data-placeholder="Required"
+                                data-showbuttons="true"
+                                data-original-title="Enter a contract" class="editable editable-click"
         >{{contract}}</a>');
 }
 </pre>
     </div>
 </div>
-<div class="row">
-        <div class="span3">
-            <h4>Change the Arguemnts:</h4>
+<div class="steps">
+    <div class="row step-row">
+        <div class="span4 step-head">
+            2. Change the Arguemnts:
         </div>
-        <div class="span9">
+        <div class="span8">
  <pre>
 doSomething(<a xeditable href="javascript:;" id="parameter-input" data-pk="1" data-type="textarea" data-name="parameter"
                data-ng-model="parameter" data-placement="right" data-placeholder="Required" data-showbuttons="true"
                data-original-title="Enter arguments" class="editable editable-click"
          >{{parameter}}</a>);
 </pre>
-    </div>
+        </div>
 
-</div>
-<div class="row">
-    <div class="span3">
-        <h4>See the Result:</h4>
     </div>
-    <div class="span9">
-     <pre class="ignore-ws"><span class="result-valid" ng-show="error == null">Valid :)</span><span class="result-invalid" ng-hide="error == null">{{ error }}</span></pre>
+    <div class="row step-row">
+        <div class="span4 step-head">
+            3. See the Result:
+        </div>
+        <div class="span8">
+            <pre class="ignore-ws"><span class="result-valid" ng-show="error == null">Valid :)</span><span
+                    class="result-invalid" ng-hide="error == null">{{ error }}</span></pre>
+        </div>
     </div>
 </div>

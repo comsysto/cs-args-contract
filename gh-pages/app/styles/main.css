@@ -41,3 +41,24 @@ td.input-cell {
 .ignore-ws{
     white-space: normal;
 }
+
+.step-row{
+    display: table-row;
+}
+
+.step-head{
+    margin: 10px 0;
+    font-family: inherit;
+    font-weight: bold;
+    line-height: 20px;
+    color: inherit;
+    text-rendering: optimizelegibility;
+    font-size: 17.5px;
+    font-style: italic;
+    vertical-align:middle;
+    display: table-cell;
+}
+
+.steps {
+    display: table;
+}

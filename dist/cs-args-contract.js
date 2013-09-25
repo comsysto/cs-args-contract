@@ -129,6 +129,14 @@
                 return _.isNumber(arg);
             },
 
+            date: function(type, arg){
+                return _.isDate(arg);
+            },
+
+            regex: function(type, arg){
+                return _.isRegExp(arg);
+            },
+
             'function': function(type, arg) {
                 return _.isFunction(arg);
             },
@@ -162,6 +170,21 @@
                         var propType = types[key];
                         var propValue = arg[key];
                         if (!testObjectByType(propType, propValue)) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
+
+            hash: function(type, arg) {
+                if (!_.isObject(arg)) {
+                    return false;
+                }
+
+                for (var key in arg) {
+                    if (arg.hasOwnProperty(key)) {
+                        if (!testObjectByType(type.valueType, arg[key])) {
                             return false;
                         }
                     }
@@ -435,7 +458,7 @@
                 baseMessage = baseMessage + "Expression failed: {" + error.expression + "}";
             }
 
-            var newError = new Error(baseMessage + ' Contract: ' + contract + ' Arguments: ' + JSON.stringify(_(args).toArray()));
+            var newError = new Error(baseMessage + ' Contract: \'' + contract + '\' Arguments: ' + JSON.stringify(_(args).toArray()));
             newError.name = error.name;
             newError.code = error.code;
             newError.contract = contract;
@@ -561,12 +584,15 @@
         "string": parse_string,
         "number": parse_number,
         "boolean": parse_boolean,
+        "date": parse_date,
+        "regex": parse_regex,
         "function": parse_function,
         "null": parse_null,
         "undefined": parse_undefined,
         "any": parse_any,
         "array": parse_array,
         "object": parse_object,
+        "hash": parse_hash,
         "propertyAndType": parse_propertyAndType,
         "propertyName": parse_propertyName,
         "ctor": parse_ctor,
@@ -871,23 +897,32 @@
           if (result0 === null) {
             result0 = parse_boolean();
             if (result0 === null) {
-              result0 = parse_function();
+              result0 = parse_date();
               if (result0 === null) {
-                result0 = parse_null();
+                result0 = parse_function();
                 if (result0 === null) {
-                  result0 = parse_undefined();
+                  result0 = parse_regex();
                   if (result0 === null) {
-                    result0 = parse_array();
+                    result0 = parse_null();
                     if (result0 === null) {
-                      result0 = parse_object();
+                      result0 = parse_undefined();
                       if (result0 === null) {
-                        result0 = parse_ctor();
+                        result0 = parse_array();
                         if (result0 === null) {
-                          result0 = parse_any();
+                          result0 = parse_hash();
                           if (result0 === null) {
-                            result0 = parse_not();
+                            result0 = parse_object();
                             if (result0 === null) {
-                              result0 = parse_bracketed();
+                              result0 = parse_ctor();
+                              if (result0 === null) {
+                                result0 = parse_any();
+                                if (result0 === null) {
+                                  result0 = parse_not();
+                                  if (result0 === null) {
+                                    result0 = parse_bracketed();
+                                  }
+                                }
+                              }
                             }
                           }
                         }
@@ -997,6 +1032,74 @@
         }
         if (result0 !== null) {
           result0 = (function(offset) {return {name: 'boolean'}; })(pos0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_date() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        if (input.substr(pos, 4) === "date") {
+          result0 = "date";
+          pos += 4;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"date\"");
+          }
+        }
+        if (result0 !== null) {
+          result0 = (function(offset) {return {name: 'date'}})(pos0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_regex() {
+        var result0, result1;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.substr(pos, 5) === "regex") {
+          result0 = "regex";
+          pos += 5;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"regex\"");
+          }
+        }
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 112) {
+            result1 = "p";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"p\"");
+            }
+          }
+          result1 = result1 !== null ? result1 : "";
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset) {return {name: 'regex'}})(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1328,6 +1431,110 @@
                 }
                 return {name: 'object', properties: obj};
             })(pos0, result0[2], result0[4]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_hash() {
+        var result0, result1, result2, result3, result4, result5, result6, result7, result8;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.charCodeAt(pos) === 123) {
+          result0 = "{";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"{\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = parse_ws();
+          if (result1 !== null) {
+            if (input.charCodeAt(pos) === 42) {
+              result2 = "*";
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"*\"");
+              }
+            }
+            if (result2 !== null) {
+              result3 = parse_ws();
+              if (result3 !== null) {
+                if (input.charCodeAt(pos) === 58) {
+                  result4 = ":";
+                  pos++;
+                } else {
+                  result4 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\":\"");
+                  }
+                }
+                if (result4 !== null) {
+                  result5 = parse_ws();
+                  if (result5 !== null) {
+                    result6 = parse_complexType();
+                    if (result6 !== null) {
+                      result7 = parse_ws();
+                      if (result7 !== null) {
+                        if (input.charCodeAt(pos) === 125) {
+                          result8 = "}";
+                          pos++;
+                        } else {
+                          result8 = null;
+                          if (reportFailures === 0) {
+                            matchFailed("\"}\"");
+                          }
+                        }
+                        if (result8 !== null) {
+                          result0 = [result0, result1, result2, result3, result4, result5, result6, result7, result8];
+                        } else {
+                          result0 = null;
+                          pos = pos1;
+                        }
+                      } else {
+                        result0 = null;
+                        pos = pos1;
+                      }
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, valueType) {
+                return {name: 'hash', valueType:valueType};
+            })(pos0, result0[6]);
         }
         if (result0 === null) {
           pos = pos0;

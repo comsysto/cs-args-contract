@@ -84,6 +84,30 @@ describe('cs-args-contract', function() {
         contractViolation([1, {}], 'num,num', 2);
     });
 
+    it('can check date', function() {
+        valid([new Date()], 'date');
+        contractViolation([1, true], 'num,date', 2);
+        contractViolation([1, 'str'], 'num,date', 2);
+        contractViolation([1, null], 'num,date', 2);
+        contractViolation([1, undefined], 'num,date', 2);
+        contractViolation([1, []], 'num,date', 2);
+        contractViolation([1, [new Date()]], 'num,date', 2);
+        contractViolation([1, {}], 'num,date', 2);
+    });
+
+    it('can check regexp', function() {
+        valid([new RegExp('.*')], 'regexp');
+        valid([/.*/], 'regex');
+        contractViolation([1, true], 'num,regex', 2);
+        contractViolation([1, 'str'], 'num,regex', 2);
+        contractViolation([1, null], 'num,regex', 2);
+        contractViolation([1, undefined], 'num,regex', 2);
+        contractViolation([1, []], 'num,regex', 2);
+        contractViolation([1, [/./]], 'num,regex', 2);
+        contractViolation([1, {}], 'num,regex', 2);
+    });
+
+
     it('can check functions', function() {
         function f() {
         }
@@ -99,6 +123,13 @@ describe('cs-args-contract', function() {
         valid([{name: 'peter'}], '{}');
         valid([{name: 'peter'}], '{name: str}');
         contractViolation([{}], '{name: str}', 1);
+    });
+
+    it('can check hashes', function() {
+        valid([{}], '{* : str}');
+        valid([{one: 1, two: 2, three: 3}], '{*: num}');
+        valid([{'peter': {name: 'peter'}, 'hans': {name: 'hans'}}], '{* : {name: str}}');
+        contractViolation([{one: '1', two: 2}], '{*: str}', 1);
     });
 
     it('can check constructors', function() {

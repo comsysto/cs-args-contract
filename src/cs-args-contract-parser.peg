@@ -19,11 +19,12 @@ paramList
   = ws p0:param ws "," ws pn:paramList ws { return [p0].concat(pn); }
   / ws p0:param ws { return [p0]; }
 
-param =
-  optionalParam / varargsParam / mandatoryParam
+param
+  = optionalParam / varargsParam / mandatoryParam
 
 
-expression = chars: [^}]+ { return chars.join(''); }
+expression
+  = chars: [^}]+ { return chars.join(''); }
 
 complexType
   = or / and / simpleType
@@ -34,7 +35,7 @@ simpleType
   / nativeType
 
 nativeType
-  = string / number / boolean / function / null / undefined / array  / object / ctor / any / not / bracketed
+  = string / number / boolean / date / function / regex / null / undefined / array / hash / object / ctor / any / not / bracketed
 
 string
     = ("string" / "str") {return {name: 'string'}; }
@@ -44,6 +45,12 @@ number
 
 boolean
     = ("boolean" / "bool") {return {name: 'boolean'}; }
+
+date
+    = "date" {return {name: 'date'}}
+
+regex
+    = "regex" "p"? {return {name: 'regex'}}
 
 function
     = ("function" / "func") {return {name: 'function'}; }
@@ -71,6 +78,12 @@ object
           obj[props[i][3][0]] = props[i][3][1]
         }
         return {name: 'object', properties: obj};
+    }
+
+hash
+    = "{" ws "*" ws ":" ws valueType:complexType ws "}"
+    {
+        return {name: 'hash', valueType:valueType};
     }
 
 propertyAndType
