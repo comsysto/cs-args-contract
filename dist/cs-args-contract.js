@@ -458,7 +458,14 @@
                 baseMessage = baseMessage + "Expression failed: {" + error.expression + "}";
             }
 
-            var newError = new Error(baseMessage + ' Contract: \'' + contract + '\' Arguments: ' + JSON.stringify(_(args).toArray()));
+            var argsDebug = _(args).toArray();
+            try{
+                argsDebug = JSON.stringify(argsDebug);
+            }catch(e){
+                // ignore format errors, this can happen if there is circle in the args object graph
+            }
+
+            var newError = new Error(baseMessage + ' Contract: \'' + contract + '\' Arguments: ' + argsDebug);
             newError.name = error.name;
             newError.code = error.code;
             newError.contract = contract;

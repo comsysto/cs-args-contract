@@ -62,6 +62,8 @@ The examples above can be combined in any way.
 + __num, number__: a number
 + __bool, boolean__: a boolean
 + __fun, function__: a function
++ __date__: a Date object
++ __regexp, regex: a RegExp object
 + __null__: the null value
 + __undef, undefined__: the undefined value
 + __any__: will match any parameter
