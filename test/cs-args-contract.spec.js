@@ -202,6 +202,13 @@ describe('cs-args-contract', function() {
         contractViolation([[2, 3, 4, 5, 6], "lub"], '[num], str {{ re("^b.*/") }}', 2);
     });
 
+    it('can evaluate expressions with the oneOf function', function() {
+        valid([[2, 3, 4, 2, 4], "blub"], '[num {{ oneOf(2, 3, 4) }}], str');
+        contractViolation([[2, 3, 4, 5, 6, 10], "blub"], '[num {{ oneOf(2, 3, 4)}} ], str', 1);
+        valid([['a', 'b', 'a', 'b', 'b'], "blub"], '[ string {{ oneOf("a", "b") }} ], str');
+        contractViolation([['a', 'b', 'a', 'c', 'b'], "blub"], '[ string {{ oneOf("a", "b") }} ], str', 1);
+    });
+
 
 
     it('can complicated stuff', function() {
