@@ -35,6 +35,18 @@
             return $$.length;
         }
 
+        // function to check a value is one of a list of values eg. string {{ oneOf('GET', 'POST') }}
+        function oneOf(){
+            var i;
+            for(i = 0; i < arguments.length; i++){
+                if($$ === arguments[i]){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         return eval(this.toString());
     }
 
