@@ -1,5 +1,5 @@
  /*
-  * Copyright 2013 Otto Krammer
+  * Copyright 2015 Otto Krammer
   *
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -31,11 +31,14 @@ complexType
 
 simpleType
   = not
-  / type:nativeType ws "{{" expression:expression "}}" { type.expression = expression; return type; }
-  / nativeType
+  / type:suffixType ws "{{" expression:expression "}}" { type.expression = expression; return type; }
+  / suffixType
+
+suffixType
+ = array_ts / nativeType
 
 nativeType
-  = string / number / boolean / date / function / regex / null / undefined / array / hash / object / ctor / any / not / bracketed
+  = string / number / boolean / date / function / regex / null / undefined / hash / object / ctor / any / array_legacy / not / bracketed
 
 string
     = ("string" / "str") {return {name: 'string'}; }
@@ -64,7 +67,10 @@ undefined
 any
     = "any" {return {name: 'any'};}
 
-array
+array_ts
+    = type:nativeType ws "[" ws "]" { return {name: 'array', elementType: type}; }
+
+array_legacy
     = "[" ws type:complexType ws "]" { return {name: 'array', elementType: type}; }
 
 object

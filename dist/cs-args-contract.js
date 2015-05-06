@@ -599,6 +599,7 @@
         "expression": parse_expression,
         "complexType": parse_complexType,
         "simpleType": parse_simpleType,
+        "suffixType": parse_suffixType,
         "nativeType": parse_nativeType,
         "string": parse_string,
         "number": parse_number,
@@ -609,7 +610,8 @@
         "null": parse_null,
         "undefined": parse_undefined,
         "any": parse_any,
-        "array": parse_array,
+        "array_ts": parse_array_ts,
+        "array_legacy": parse_array_legacy,
         "object": parse_object,
         "hash": parse_hash,
         "propertyAndType": parse_propertyAndType,
@@ -847,7 +849,7 @@
         if (result0 === null) {
           pos0 = pos;
           pos1 = pos;
-          result0 = parse_nativeType();
+          result0 = parse_suffixType();
           if (result0 !== null) {
             result1 = parse_ws();
             if (result1 !== null) {
@@ -901,8 +903,18 @@
             pos = pos0;
           }
           if (result0 === null) {
-            result0 = parse_nativeType();
+            result0 = parse_suffixType();
           }
+        }
+        return result0;
+      }
+      
+      function parse_suffixType() {
+        var result0;
+        
+        result0 = parse_array_ts();
+        if (result0 === null) {
+          result0 = parse_nativeType();
         }
         return result0;
       }
@@ -926,15 +938,15 @@
                     if (result0 === null) {
                       result0 = parse_undefined();
                       if (result0 === null) {
-                        result0 = parse_array();
+                        result0 = parse_hash();
                         if (result0 === null) {
-                          result0 = parse_hash();
+                          result0 = parse_object();
                           if (result0 === null) {
-                            result0 = parse_object();
+                            result0 = parse_ctor();
                             if (result0 === null) {
-                              result0 = parse_ctor();
+                              result0 = parse_any();
                               if (result0 === null) {
-                                result0 = parse_any();
+                                result0 = parse_array_legacy();
                                 if (result0 === null) {
                                   result0 = parse_not();
                                   if (result0 === null) {
@@ -1240,7 +1252,69 @@
         return result0;
       }
       
-      function parse_array() {
+      function parse_array_ts() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_nativeType();
+        if (result0 !== null) {
+          result1 = parse_ws();
+          if (result1 !== null) {
+            if (input.charCodeAt(pos) === 91) {
+              result2 = "[";
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"[\"");
+              }
+            }
+            if (result2 !== null) {
+              result3 = parse_ws();
+              if (result3 !== null) {
+                if (input.charCodeAt(pos) === 93) {
+                  result4 = "]";
+                  pos++;
+                } else {
+                  result4 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\"]\"");
+                  }
+                }
+                if (result4 !== null) {
+                  result0 = [result0, result1, result2, result3, result4];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, type) { return {name: 'array', elementType: type}; })(pos0, result0[0]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_array_legacy() {
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
         

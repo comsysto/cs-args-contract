@@ -68,6 +68,7 @@ The examples above can be combined in any way.
 + __undef, undefined__: the undefined value
 + __any__: will match any parameter
 + __\[ TYPE \]__: an array of elements of TYPE
++ __TYPE\[\]__: an array of elements of TYPE (typescript like syntax)
 + __{ PROP: TYPE, ... }__: An object that must contain a property named PROP that has a value of type TYPE
 + **CTOR_NAME**: The name of a constructor function. The name must start with a capital letter.
 + __( TYPE )__: You can use brackets to group type expressions.

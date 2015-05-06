@@ -180,6 +180,12 @@ describe('cs-args-contract', function() {
 
     });
 
+    it('can evaluate different style of arrays', function() {
+        valid([[4, 3, 4]],          '[num]{{$$.length > 2}} | (string | num)[]{{ true }}');
+        valid([["5", 3]],           '[num]{{$$.length > 2}} | (string | num)[]{{ true }}');
+        contractViolation([[true, 3]], '[num]{{$$.length > 2}} | (string | num)[]{{ true }}', 1);
+    });
+
     it('can evaluate expressions', function() {
         valid([1, 3], 'num{{$$ < 2}}, num{{$$ > 2}}');
         contractViolation([2, 3], 'num{{$$ < 2}}, num{{$$ > 2}}', 1);
