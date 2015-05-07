@@ -51,7 +51,7 @@ See some more examples for contract strings:
 + __'{name: string}'__: the argument must be an object and must have a property called 'name' that has a string value.
 + __'{name: string, index: num | undef}'__: the argument must be an object and must have a property called 'name' that
  has a string value and a optional property named index that must be a number if present.
-+ __'Customer'__: the argument must be an object who's constructor name is 'Customer'
++ __'Customer'__: the argument must be an object who's constructor name is 'Customer', in browsers that support the 'Object.getPrototypeOf' function the objects prototype chain is also inspected to support inheritance. The constructor name must start with a capital letter to be handled correctly. 
 
 The examples above can be combined in any way.
 
@@ -114,7 +114,7 @@ For example: To specify that the first argument must be less or equal than the s
     argsContract(arguments, 'num, num', '$1 <= $2');
 
 # Browser Support #
-* IE 8
+* IE 8 (IE 9 for prototype chain support in constructor name checks)
 * Chrome
 * Firefox
 

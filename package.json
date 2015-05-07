@@ -1,6 +1,6 @@
 {
   "name": "cs-args-contract",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Contract checking for function arguments",
   "main": "Gruntfile.js",
   "directories": {

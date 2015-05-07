@@ -205,7 +205,15 @@
             },
 
             namedObject: function(type, arg) {
-                return _.isObject(arg) && _.isFunction(arg.constructor) && functionName(arg.constructor) === type.ctorName;
+                if(! _.isObject(arg)){
+                    return false;
+                }
+
+                if(typeof(Object.getPrototypeOf) === 'function'){
+                    return namedObjectWithHierarchy(type.ctorName, arg);
+                }
+
+                return namedObjectBasic(type.ctorName, arg);
             }
 
         };
@@ -221,6 +229,36 @@
             EXPRESSION_ERROR: 'Contract Error: Failed evaluating expression: ',
             EXPRESSION_ARGS: 'Contract Violation: Failed evaluating expression: '
         };
+
+        function namedObjectBasic(typeName, arg){
+            return _.isFunction(arg.constructor) && functionName(arg.constructor) === typeName
+        }
+
+        function namedObjectWithHierarchy(typeName, arg){
+            var currentObject = arg,
+                currentFunctionName;
+
+
+            while(true){
+                if(currentObject === Object.prototype){
+                    return false;
+                }
+
+                // so we found object
+                if(! _.isFunction(currentObject.constructor)){
+                    return false;
+                }
+                currentFunctionName = functionName(currentObject.constructor);
+                if(currentFunctionName === typeName){
+                    return true;
+                }
+
+
+                currentObject = Object.getPrototypeOf(currentObject);
+            }
+
+            return false;
+        }
 
 
         function functionName(func) {

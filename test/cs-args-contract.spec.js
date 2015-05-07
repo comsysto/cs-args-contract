@@ -147,6 +147,29 @@ describe('cs-args-contract', function() {
         contractViolation([1, new NoNamedCtor()], 'num, NoNamedCtor', 2);
     });
 
+    it('can check constructors with inheritance', function() {
+        function Human() {
+        }
+
+        function Customer() {
+            Human.call(this);
+        }
+
+        Customer.prototype = Object.create(Human.prototype);
+        Customer.prototype.constructor = Customer;
+
+        function Animal() {
+        }
+
+        valid([new Customer()], 'Customer');
+        valid([new Customer()], 'Human');
+        valid([new Human()], 'Human');
+
+        contractViolation([new Human()], 'Customer', 1);
+        contractViolation([new Animal()], 'Human', 1);
+
+    });
+
     it('can negate types', function() {
         valid([4], '!str');
         valid([4], '!bool');
